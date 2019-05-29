@@ -20,12 +20,12 @@ RECOGNISED_ALGORITHMS = (
 
 _INTEGRITY_PATTERN = re.compile(r'''
     [ \t]*                                  # RFC 5234 (ABNF): WSP
-    (?P<algorithm>sha256|sha384|sha512)     # W3C CSP2: hash-algo
+    (?P<algorithm>%(algorithms)s)           # W3C CSP2: hash-algo
     -
     (?P<b58_digest>[a-zA-Z0-9+/]+[=]{0,2})  # W3C CSP2: base64-value
     (?P<options>\?[\041-\176]*)?            # RFC 5234 (ABNF): VCHAR
     [ \t]*                                  # RFC 5234 (ABNF): WSP
-    ''',
+    ''' % dict(algorithms='|'.join(RECOGNISED_ALGORITHMS)),
     re.VERBOSE,
 )
 
