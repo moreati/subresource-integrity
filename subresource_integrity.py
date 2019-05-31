@@ -22,7 +22,7 @@ _INTEGRITY_PATTERN = re.compile(r'''
     [ \t]*                                  # RFC 5234 (ABNF): WSP
     (?P<algorithm>%(algorithms)s)           # W3C CSP2: hash-algo
     -
-    (?P<b58_digest>[a-zA-Z0-9+/]+[=]{0,2})  # W3C CSP2: base64-value
+    (?P<b64digest>[a-zA-Z0-9+/]+[=]{0,2})   # W3C CSP2: base64-value
     (?P<options>\?[\041-\176]*)?            # RFC 5234 (ABNF): VCHAR
     [ \t]*                                  # RFC 5234 (ABNF): WSP
     ''' % dict(algorithms='|'.join(RECOGNISED_ALGORITHMS)),
@@ -47,8 +47,8 @@ class Hash(object):
         return cls(algorithm, digest, options)
 
     @classmethod
-    def fromhash(cls, algorithm, b58_digest, options):
-        digest = base64.standard_b64decode(b58_digest)
+    def fromhash(cls, algorithm, b64digest, options=''):
+        digest = base64.standard_b64decode(b64digest)
         return cls(algorithm, digest, options)
 
     @classmethod
@@ -56,10 +56,10 @@ class Hash(object):
         m = _INTEGRITY_PATTERN.match(s)
         if not m:
             raise ValueError
-        algorithm = m.group('alogrithm')
-        b58_digest = m.group('b58_digest')
+        algorithm = m.group('algorithm')
+        b64digest = m.group('b64digest')
         options = m.group('options')[1:] # Remove leading '?'
-        return cls.fromhash(alogrithm, b58_digest, options)
+        return cls.fromhash(algorithm, b64digest, options)
 
     @property
     def algorithm(self):
@@ -74,19 +74,23 @@ class Hash(object):
         return self._options
 
     @property
-    def b58digest(self):
+    def b64digest(self):
         return base64.standard_b64encode(self._digest).decode('ascii')
+
+    @property
+    def b58digest(self):
+        return self.b64digest
 
     def __repr__(self):
         return "%s.%s('%s', '%s', '%s')" % (self.__class__.__module__,
                                             self.__class__.__name__,
-                                            self.algorithm, self.b58digest,
+                                            self.algorithm, self.b64digest,
                                             self.options)
 
     def __str__(self):
         if not self.options:
-            return '%s-%s' % (self.algorithm, self.b58digest)
-        return '%s-%s?%s' % (self.algorithm, self.b58digest, self.options)
+            return '%s-%s' % (self.algorithm, self.b64digest)
+        return '%s-%s?%s' % (self.algorithm, self.b64digest, self.options)
 
     def __eq__(self, other):
         if isinstance(other, Hash):
@@ -104,7 +108,7 @@ def generate(data, algorithms=(DEFAULT_ALOGRITHM,)):
     algorithms
 
     >>> for ihash in generate(b"alert('Hello, world.');"):
-    ...     print ('%s %s' % (ihash.algorithm, ihash.b58digest))
+    ...     print ('%s %s' % (ihash.algorithm, ihash.b64digest))
     sha384 H8BRh8j48O9oYatfu5AZzq6A9RINhZO5H16dQZngK7T62em8MUt1FLm52t+eX6xO
 
     >>> list(generate(b"alert('Hello, world.');", ['sha256', 'sha384']))
