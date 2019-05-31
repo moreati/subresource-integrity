@@ -4,13 +4,13 @@ import re
 
 
 __all__ = (
-    'DEFAULT_ALOGRITHM',
+    'DEFAULT_ALGORITHM',
     'RECOGNISED_ALGORITHMS',
     'generate',
     'parse',
 )
 
-DEFAULT_ALOGRITHM = 'sha384'
+DEFAULT_ALGORITHM = 'sha384'
 
 RECOGNISED_ALGORITHMS = (
     'sha512',
@@ -39,7 +39,7 @@ class Hash(object):
         return self
 
     @classmethod
-    def fromresource(cls, resource, algorithm=DEFAULT_ALOGRITHM, options=''):
+    def fromresource(cls, resource, algorithm=DEFAULT_ALGORITHM, options=''):
         if algorithm not in RECOGNISED_ALGORITHMS:
             raise ValueError
         hasher = hashlib.new(algorithm, resource)
@@ -103,7 +103,7 @@ class Hash(object):
         return hash((self.algorithm, self.digest, self.options))
 
 
-def generate(data, algorithms=(DEFAULT_ALOGRITHM,)):
+def generate(data, algorithms=(DEFAULT_ALGORITHM,)):
     """Yields subresource integrity Hash objects for the given data &
     algorithms
 
@@ -119,7 +119,7 @@ def generate(data, algorithms=(DEFAULT_ALOGRITHM,)):
     return (Hash.fromresource(data, algorithm) for algorithm in algorithms)
 
 
-def render(data, algorithms=(DEFAULT_ALOGRITHM,), seperator=' '):
+def render(data, algorithms=(DEFAULT_ALGORITHM,), seperator=' '):
     """Returns a subresource integrity string for the given data &
     algorithms
 
