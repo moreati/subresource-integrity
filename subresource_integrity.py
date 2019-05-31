@@ -58,7 +58,8 @@ class Hash(object):
             raise ValueError("Not a valid integrity value: {!r}".format(s))
         algorithm = m.group('algorithm')
         b64digest = m.group('b64digest')
-        options = m.group('options')[1:] # Remove leading '?'
+        options = m.group('options') or ''
+        options = options[1:] # Remove leading '?'
         return cls.fromhash(algorithm, b64digest, options)
 
     @property
