@@ -32,16 +32,27 @@ _INTEGRITY_PATTERN = re.compile(r'''
 
 class Hash(object):
     def __new__(cls, algorithm, digest, options=''):
+        cls._check_algorithm(algorithm)
         self = object.__new__(cls)
         self._algorithm = algorithm
         self._digest = digest
         self._options = options
         return self
 
+    @staticmethod
+    def _check_algorithm(algorithm):
+        if algorithm not in RECOGNISED_ALGORITHMS:
+            raise ValueError(
+                "Unsupported hash algorithm {algorithm!r}, must be one of: {algorithms}"
+                .format(
+                    algorithm=algorithm,
+                    algorithms=", ".join(RECOGNISED_ALGORITHMS),
+                ),
+            )
+
     @classmethod
     def fromresource(cls, resource, algorithm=DEFAULT_ALGORITHM, options=''):
-        if algorithm not in RECOGNISED_ALGORITHMS:
-            raise ValueError
+        cls._check_algorithm(algorithm)
         hasher = hashlib.new(algorithm, resource)
         digest = hasher.digest()
         return cls(algorithm, digest, options)
