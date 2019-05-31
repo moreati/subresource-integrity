@@ -33,6 +33,7 @@ _INTEGRITY_PATTERN = re.compile(r'''
 class Hash(object):
     def __new__(cls, algorithm, digest, options=''):
         cls._check_algorithm(algorithm)
+        cls._check_digest(digest, algorithm)
         self = object.__new__(cls)
         self._algorithm = algorithm
         self._digest = digest
@@ -48,6 +49,20 @@ class Hash(object):
                     algorithm=algorithm,
                     algorithms=", ".join(RECOGNISED_ALGORITHMS),
                 ),
+            )
+
+    @staticmethod
+    def _check_digest(digest, algorithm):
+        if not isinstance(digest, bytes):
+            raise TypeError("Digest must be a binary string")
+        h = hashlib.new(algorithm)
+        if len(digest) != h.digest_size:
+            raise ValueError(
+                "Digest length {l1} doesn't match algorithm digest length {l2}"
+                .format(
+                    l1=len(digest),
+                    l2=h.digest_size,
+                )
             )
 
     @classmethod
