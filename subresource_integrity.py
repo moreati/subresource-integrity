@@ -55,7 +55,7 @@ class Hash(object):
     def fromhashexpr(cls, s):
         m = _INTEGRITY_PATTERN.match(s)
         if not m:
-            raise ValueError
+            raise ValueError("Not a valid integrity value: {!r}".format(s))
         algorithm = m.group('algorithm')
         b64digest = m.group('b64digest')
         options = m.group('options')[1:] # Remove leading '?'
