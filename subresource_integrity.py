@@ -32,6 +32,19 @@ _INTEGRITY_PATTERN = re.compile(r'''
 
 class Hash(object):
     def __new__(cls, algorithm, digest, options=''):
+        r"""Return a new Hash object.
+
+        Args:
+            algorithm (str): Hashing algorithm, one of `RECOGNISED_ALGORITHMS`
+            digest (bytes): Hash digest as a binary string, as returned by
+                            the `digest()` method of a `hashlib.new()` object.
+            options (str): Any options
+
+        >>> import hashlib
+        >>> h = hashlib.sha256(b'Hello world')
+        >>> Hash(h.name, h.digest())
+        subresource_integrity.Hash('sha256', 'ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=', '')
+        """
         cls._check_algorithm(algorithm)
         cls._check_digest(digest, algorithm)
         self = object.__new__(cls)
@@ -67,6 +80,17 @@ class Hash(object):
 
     @classmethod
     def fromresource(cls, resource, algorithm=DEFAULT_ALGORITHM, options=''):
+        """Return a Hash object, by hashing the data in `resource` using hash
+        `algorithm`.
+
+        Args:
+            resource (bytes): Date to be hashed
+            algorithm (str): Hash algorithm, one of `RECOGNISED_ALGORITHMS`
+            options: Any options
+
+        >>> Hash.fromresource(b'Hello world', 'sha256')
+        subresource_integrity.Hash('sha256', 'ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=', '')
+        """
         cls._check_algorithm(algorithm)
         hasher = hashlib.new(algorithm, resource)
         digest = hasher.digest()
@@ -74,11 +98,26 @@ class Hash(object):
 
     @classmethod
     def fromhash(cls, algorithm, b64digest, options=''):
+        """Return a Hash object from algorithm, a base64 digest, & options.
+
+        Args:
+            algorithm (str): Hash algorithm, one of `RECOGNISED_ALGORITHMS`
+            b64digest (str): Base64 encoded digest.
+            options (str): Any options
+
+        >>> Hash.fromhash('sha256', 'ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=')
+        subresource_integrity.Hash('sha256', 'ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=', '')
+        """
         digest = base64.standard_b64decode(b64digest)
         return cls(algorithm, digest, options)
 
     @classmethod
     def fromhashexpr(cls, s):
+        """Return a Hash object, from a Subresource Integrity string.
+
+        >>> Hash.fromhashexpr('sha256-ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=')
+        subresource_integrity.Hash('sha256', 'ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=', '')
+        """
         m = _INTEGRITY_PATTERN.match(s)
         if not m:
             raise ValueError("Not a valid integrity value: {!r}".format(s))
@@ -90,22 +129,34 @@ class Hash(object):
 
     @property
     def algorithm(self):
+        """Hashing algorithm, one of `RECOGNISED_ALGORITHMS`.
+        """
         return self._algorithm
 
     @property
     def digest(self):
+        """Hash digest, as a binary string.
+        """
         return self._digest
 
     @property
     def options(self):
+        """Any options.
+        """
         return self._options
 
     @property
     def b64digest(self):
+        """Hash digest, encoded as base64.
+        """
         return base64.standard_b64encode(self._digest).decode('ascii')
 
     @property
     def b58digest(self):
+        """Hash digest, encoded as base64.
+
+        This property is a deprecated alias for `Hash.b64digest`.
+        """
         return self.b64digest
 
     def __repr__(self):
@@ -188,4 +239,3 @@ def parse(integrity):
     matches = _INTEGRITY_PATTERN.findall(integrity)
     matches.sort(key=lambda t: RECOGNISED_ALGORITHMS.index(t[0]))
     return [Hash.fromhash(*match) for match in matches]
-
