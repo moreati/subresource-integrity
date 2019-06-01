@@ -2,7 +2,7 @@
 subresource-integrity
 =====================
 
-A Python package to create and parse `subresource integrity` values
+A Python package to create and parse `Subresource Integrity`_ values.
 
 Usage
 =====
@@ -26,3 +26,4 @@ Usage
     >>> [str(h) for h in parsed]
     ['sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=']
 
+.. _subresource integrity: https://en.wikipedia.org/wiki/Subresource_Integrity
