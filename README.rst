@@ -4,6 +4,13 @@ subresource-integrity
 
 A Python package to create and parse `Subresource Integrity`_ values.
 
+Installation
+============
+
+.. code:: shell
+
+    pip install subresource-integrity
+
 Usage
 =====
 
