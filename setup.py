@@ -11,7 +11,7 @@ def read(fname, encoding='utf-8'):
 
 setup(
     name='subresource-integrity',
-    version=0.1,
+    version=0.2,
     license='BSD',
     description='Create and parse HTML subresource integrity values',
     long_description=read('README.rst'),
